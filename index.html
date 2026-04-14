@@ -341,10 +341,22 @@
     }
 
     .btn.primary {
-      color: #071018;
-      background: linear-gradient(135deg, var(--cyan), #b9fbff);
-      box-shadow: 0 0 16px rgba(108,247,255,0.34);
+      color: var(--text);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: none;
       pointer-events: none;
+    }
+
+    .hero-actions .btn {
+      pointer-events: auto;
+    }
+
+    .hero-actions .btn:hover {
+      border-color: rgba(108,247,255,0.35);
+      box-shadow: 0 0 16px rgba(108,247,255,0.34);
+      background: linear-gradient(135deg, rgba(108,247,255,0.18), rgba(185,251,255,0.08));
+      color: #dffcff;
     }
 
     .btn.secondary {
@@ -379,8 +391,9 @@
       </div>
       <div class="hero-actions">
         <a class="btn primary" href="https://snake.davushvat.com">Play Snake</a>
-        <a class="btn secondary" href="https://flappy.davushvat.com">Play Flappy</a>
-        <a class="btn secondary" href="https://race.davushvat.com">Play Race</a>
+        <a class="btn primary" href="https://flappy.davushvat.com">Play Flappy</a>
+        <a class="btn primary" href="https://race.davushvat.com">Play Race</a>
+        <a class="btn primary" href="https://jump.davushvat.com">Play Jump</a>
       </div>
     </section>
 
