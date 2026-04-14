@@ -6,9 +6,10 @@
   <title>Davushvat Arcade</title>
   <style>
     :root {
-      --bg: #050816;
-      --bg2: #0f1736;
-      --panel: rgba(10, 16, 38, 0.8);
+      --bg: #040713;
+      --bg2: #10193a;
+      --panel: rgba(10, 16, 38, 0.76);
+      --panel-strong: rgba(12, 20, 48, 0.9);
       --line: rgba(120, 245, 255, 0.16);
       --text: #ebf7ff;
       --muted: #95a8c8;
@@ -16,145 +17,358 @@
       --pink: #ff4fd8;
       --lime: #b8ff6a;
       --orange: #ffb454;
+      --violet: #8b5cf6;
     }
+
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       min-height: 100vh;
       font-family: Inter, Arial, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at top, rgba(255,79,216,0.18), transparent 28%),
-        radial-gradient(circle at 15% 20%, rgba(108,247,255,0.12), transparent 26%),
+        radial-gradient(circle at top, rgba(255,79,216,0.18), transparent 24%),
+        radial-gradient(circle at 18% 20%, rgba(108,247,255,0.11), transparent 24%),
         linear-gradient(180deg, var(--bg2), var(--bg));
       overflow-x: hidden;
       overflow-y: auto;
     }
+
     body::before {
       content: "";
       position: fixed;
       inset: 0;
       pointer-events: none;
       background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.03) 0, rgba(255,255,255,0.03) 1px, transparent 2px, transparent 4px);
-      opacity: 0.18;
+      opacity: 0.16;
       mix-blend-mode: soft-light;
     }
+
+    .bg-orb {
+      position: fixed;
+      border-radius: 999px;
+      filter: blur(70px);
+      opacity: 0.18;
+      pointer-events: none;
+    }
+
+    .orb-a {
+      width: 240px;
+      height: 240px;
+      background: var(--cyan);
+      top: 80px;
+      left: -30px;
+    }
+
+    .orb-b {
+      width: 260px;
+      height: 260px;
+      background: var(--pink);
+      right: -40px;
+      top: 140px;
+    }
+
     .wrap {
       position: relative;
       z-index: 1;
-      max-width: 1120px;
+      max-width: 1160px;
       margin: 0 auto;
-      padding: 36px 18px 64px;
+      padding: 28px 18px 60px;
     }
+
     .hero {
-      padding: 28px;
-      border-radius: 28px;
-      background: var(--panel);
+      position: relative;
+      overflow: hidden;
+      padding: 32px;
+      border-radius: 30px;
+      background: linear-gradient(180deg, rgba(13, 22, 52, 0.95), rgba(8, 14, 32, 0.92));
       border: 1px solid var(--line);
-      box-shadow: 0 24px 80px rgba(0,0,0,0.42);
+      box-shadow: 0 24px 90px rgba(0,0,0,0.42);
       margin-bottom: 22px;
     }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 280px;
+      height: 280px;
+      border-radius: 999px;
+      right: -70px;
+      top: -70px;
+      background: radial-gradient(circle, rgba(108,247,255,0.2), rgba(108,247,255,0));
+      pointer-events: none;
+    }
+
     .badge {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       margin-bottom: 12px;
       padding: 8px 12px;
       border-radius: 999px;
       background: rgba(108,247,255,0.12);
-      border: 1px solid rgba(108,247,255,0.25);
+      border: 1px solid rgba(108,247,255,0.24);
       color: #d8fbff;
-      font-size: 0.88rem;
-      letter-spacing: 0.05em;
+      font-size: 0.84rem;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
     }
+
     h1 {
-      margin: 0 0 10px;
-      font-size: clamp(2.3rem, 5vw, 4.2rem);
-      line-height: 1;
+      margin: 0 0 12px;
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      line-height: 0.95;
       text-transform: uppercase;
-      letter-spacing: 0.07em;
+      letter-spacing: 0.08em;
       color: var(--cyan);
-      text-shadow: 0 0 14px rgba(108,247,255,0.85), 0 0 36px rgba(108,247,255,0.34);
+      text-shadow: 0 0 16px rgba(108,247,255,0.88), 0 0 40px rgba(108,247,255,0.32);
     }
+
     .sub {
       max-width: 760px;
       color: var(--muted);
-      font-size: 1.02rem;
-      line-height: 1.6;
+      font-size: 1.05rem;
+      line-height: 1.7;
+      margin-bottom: 20px;
     }
-    .section-title {
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: end;
       margin: 28px 0 14px;
+      flex-wrap: wrap;
+    }
+
+    .section-title {
       font-size: 1rem;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--cyan);
     }
+
+    .section-copy {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 18px;
     }
+
     .card {
-      background: var(--panel);
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(12, 20, 48, 0.9), rgba(8, 14, 32, 0.92));
       border: 1px solid var(--line);
-      border-radius: 24px;
+      border-radius: 26px;
       padding: 20px;
       box-shadow: 0 18px 60px rgba(0,0,0,0.35);
       display: grid;
-      gap: 14px;
+      gap: 16px;
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
     }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(108,247,255,0.34);
+      box-shadow: 0 26px 70px rgba(0,0,0,0.4);
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: auto -20% -40% auto;
+      width: 180px;
+      height: 180px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(255,79,216,0.16), rgba(255,79,216,0));
+      pointer-events: none;
+    }
+
+    .thumb {
+      height: 160px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: #0a1329;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .thumb.snake {
+      background:
+        linear-gradient(180deg, rgba(7,15,36,0.98), rgba(5,11,24,0.98)),
+        radial-gradient(circle at center, rgba(108,247,255,0.08), transparent 55%);
+    }
+
+    .thumb.snake::before {
+      content: "";
+      position: absolute;
+      inset: 16px;
+      background-image:
+        linear-gradient(rgba(108,247,255,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(108,247,255,0.08) 1px, transparent 1px);
+      background-size: 20px 20px;
+      border-radius: 12px;
+    }
+
+    .snake-trail, .snake-core {
+      position: absolute;
+      border-radius: 8px;
+      box-shadow: 0 0 16px currentColor;
+    }
+
+    .snake-trail { background: currentColor; }
+    .snake-core { background: var(--lime); color: var(--lime); }
+
+    .thumb.flappy {
+      background: linear-gradient(180deg, rgba(17,26,59,0.96), rgba(5,10,26,0.96));
+    }
+
+    .pipe, .bird, .city {
+      position: absolute;
+      border-radius: 14px;
+    }
+
+    .city {
+      bottom: 0;
+      width: 28px;
+      background: rgba(255,79,216,0.18);
+    }
+
+    .pipe {
+      width: 44px;
+      background: linear-gradient(180deg, var(--pink), var(--cyan));
+      box-shadow: 0 0 18px rgba(108,247,255,0.26);
+    }
+
+    .bird {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--lime), var(--cyan));
+      box-shadow: 0 0 16px rgba(108,247,255,0.4);
+    }
+
+    .thumb.race {
+      background: linear-gradient(180deg, rgba(14,22,48,0.96), rgba(5,10,24,0.98));
+    }
+
+    .road {
+      position: absolute;
+      inset: 0 22% 0 22%;
+      background: rgba(6,12,28,0.9);
+      border-left: 2px solid rgba(108,247,255,0.22);
+      border-right: 2px solid rgba(108,247,255,0.22);
+    }
+
+    .lane {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.32) 0 18px, transparent 18px 34px);
+      opacity: 0.7;
+    }
+
+    .car {
+      position: absolute;
+      width: 28px;
+      height: 50px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, var(--pink), var(--cyan));
+      box-shadow: 0 0 16px rgba(108,247,255,0.25);
+    }
+
     .eyebrow {
       color: var(--pink);
       font-size: 0.8rem;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
     }
+
     .card h2 {
       margin: 0;
       font-size: 1.5rem;
     }
+
     .card p {
       margin: 0;
       color: var(--muted);
-      line-height: 1.6;
+      line-height: 1.65;
+      font-size: 0.97rem;
     }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #d5e9ff;
+      font-size: 0.82rem;
+    }
+
     .actions {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 4px;
+      margin-top: 2px;
     }
+
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 44px;
+      min-height: 46px;
       padding: 0 16px;
       border-radius: 14px;
       text-decoration: none;
       font-weight: 800;
-      transition: transform 0.15s ease;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
+
     .btn:hover { transform: translateY(-1px); }
+
     .btn.primary {
       color: #071018;
       background: linear-gradient(135deg, var(--cyan), #b9fbff);
-      box-shadow: 0 0 18px rgba(108,247,255,0.45);
+      box-shadow: 0 0 18px rgba(108,247,255,0.4);
     }
+
     .btn.secondary {
       color: var(--text);
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.1);
     }
+
     .path-list {
       display: grid;
       gap: 12px;
     }
+
     .path-item {
       padding: 16px 18px;
       border-radius: 18px;
-      background: rgba(255,255,255,0.03);
+      background: var(--panel-strong);
       border: 1px solid rgba(255,255,255,0.08);
     }
+
     .path-item code {
       display: block;
       margin-top: 6px;
@@ -162,64 +376,139 @@
       font-size: 0.95rem;
       word-break: break-all;
     }
+
+    footer {
+      margin-top: 28px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 720px) {
+      .wrap { padding: 18px 12px 36px; }
+      .hero { padding: 22px; border-radius: 24px; }
+      h1 { font-size: 2.4rem; }
+      .thumb { height: 140px; }
+    }
   </style>
 </head>
 <body>
+  <div class="bg-orb orb-a"></div>
+  <div class="bg-orb orb-b"></div>
+
   <div class="wrap">
     <section class="hero">
-      <div class="badge">Davushvat Arcade</div>
-      <h1>Neon Game Hub</h1>
+      <div class="badge">⚡ Davushvat Arcade</div>
+      <h1>Play the neon collection</h1>
       <div class="sub">
-        A growing collection of small neon-style browser games. Each game lives in its own local directory and separate Vercel project, so we can keep adding more without breaking the others.
+        A growing arcade of small browser games with glowing visuals, fast loops, and clean separate projects behind each one. Jump into snake, flap through pipes, or burn down the highway in neon traffic.
+      </div>
+      <div class="hero-actions">
+        <a class="btn primary" href="https://snake.davushvat.com">Play Snake</a>
+        <a class="btn secondary" href="https://flappy.davushvat.com">Play Flappy</a>
+        <a class="btn secondary" href="https://race.davushvat.com">Play Race</a>
       </div>
     </section>
 
-    <div class="section-title">Games</div>
+    <div class="section-head">
+      <div class="section-title">Games</div>
+      <div class="section-copy">Each game is deployed separately, so the hub stays clean as the library grows.</div>
+    </div>
+
     <section class="grid">
       <article class="card">
+        <div class="thumb snake">
+          <div class="snake-trail" style="left:36px;top:88px;width:18px;height:18px;color:#6cf7ff"></div>
+          <div class="snake-trail" style="left:56px;top:88px;width:18px;height:18px;color:#6cf7ff"></div>
+          <div class="snake-trail" style="left:76px;top:88px;width:18px;height:18px;color:#6cf7ff"></div>
+          <div class="snake-trail" style="left:96px;top:88px;width:18px;height:18px;color:#ff4fd8"></div>
+          <div class="snake-core" style="left:170px;top:48px;width:16px;height:16px"></div>
+        </div>
         <div class="eyebrow">Snake-like</div>
         <h2>Neon Trail</h2>
-        <p>Fast glowing trail survival with wrap-around movement and rising speed.</p>
+        <p>Fast glowing trail survival with wrap-around movement, tight turns, and rising speed pressure.</p>
+        <div class="chip-row">
+          <span class="chip">Keyboard</span>
+          <span class="chip">Mobile buttons</span>
+          <span class="chip">Arcade survival</span>
+        </div>
         <div class="actions">
-          <a class="btn primary" href="https://davushvat.com" target="_self">Open hub</a>
-          <a class="btn secondary" href="https://snake.davushvat.com">Play snake</a>
+          <a class="btn primary" href="https://snake.davushvat.com">Play snake</a>
         </div>
       </article>
 
       <article class="card">
+        <div class="thumb flappy">
+          <div class="city" style="left:18px;height:54px"></div>
+          <div class="city" style="left:54px;height:82px"></div>
+          <div class="city" style="left:92px;height:64px"></div>
+          <div class="city" style="left:130px;height:92px"></div>
+          <div class="pipe" style="left:170px;top:-8px;height:64px"></div>
+          <div class="pipe" style="left:170px;bottom:-8px;height:54px"></div>
+          <div class="bird" style="left:88px;top:64px"></div>
+        </div>
         <div class="eyebrow">Flappy Bird style</div>
         <h2>Neon Flappy</h2>
-        <p>Tap to flap through glowing pipe gaps, now with selectable bird colors.</p>
+        <p>Tap to flap through glowing pipe gaps, with selectable bird colors and mobile-friendly controls.</p>
+        <div class="chip-row">
+          <span class="chip">Tap / click</span>
+          <span class="chip">Color picker</span>
+          <span class="chip">High score</span>
+        </div>
         <div class="actions">
           <a class="btn primary" href="https://flappy.davushvat.com">Play flappy</a>
         </div>
       </article>
 
       <article class="card">
+        <div class="thumb race">
+          <div class="road"></div>
+          <div class="lane" style="left:43%"></div>
+          <div class="lane" style="left:57%"></div>
+          <div class="car" style="left:40%;top:82px"></div>
+          <div class="car" style="left:55%;top:36px;background:linear-gradient(180deg,#b8ff6a,#6cf7ff)"></div>
+        </div>
         <div class="eyebrow">Racing</div>
         <h2>Neon Rush</h2>
-        <p>Dodge traffic, collect boosts, and survive as speed ramps up on a glowing highway.</p>
+        <p>Dodge traffic, collect boosts, and survive as the road keeps accelerating under glowing city lights.</p>
+        <div class="chip-row">
+          <span class="chip">Lane switching</span>
+          <span class="chip">Boost pickups</span>
+          <span class="chip">Endless runner</span>
+        </div>
         <div class="actions">
           <a class="btn primary" href="https://race.davushvat.com">Play race</a>
         </div>
       </article>
     </section>
 
-    <div class="section-title">Local directory structure</div>
+    <div class="section-head">
+      <div class="section-title">Project layout</div>
+      <div class="section-copy">Each game has its own local repo, deployment, and subdomain.</div>
+    </div>
+
     <section class="path-list">
       <div class="path-item">
         Main hub
         <code>/home/davushvat/.openclaw/workspace/projects/personal-site</code>
       </div>
       <div class="path-item">
-        Flappy game
+        Snake
+        <code>/home/davushvat/.openclaw/workspace/projects/snake-site</code>
+      </div>
+      <div class="path-item">
+        Flappy
         <code>/home/davushvat/.openclaw/workspace/projects/flappy-site</code>
       </div>
       <div class="path-item">
-        Racing game
+        Race
         <code>/home/davushvat/.openclaw/workspace/projects/race-site</code>
       </div>
     </section>
+
+    <footer>
+      More games can be added later without disturbing the existing ones.
+    </footer>
   </div>
 </body>
 </html>
