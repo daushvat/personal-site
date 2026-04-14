@@ -16,6 +16,7 @@
       --up: #22c55e;
       --down: #ef4444;
       --line: rgba(255,255,255,0.08);
+      --warn: #fbbf24;
     }
     * { box-sizing: border-box; }
     body {
@@ -56,19 +57,45 @@
       font-size: 0.9rem;
       margin-bottom: 10px;
     }
+    .statusline {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 0 rgba(94,234,212,0.6);
+    }
+    .dot.syncing {
+      animation: pulse 1s infinite;
+    }
+    .dot.warn {
+      background: var(--warn);
+      box-shadow: none;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(94,234,212,0.55); }
+      70% { box-shadow: 0 0 0 10px rgba(94,234,212,0); }
+      100% { box-shadow: 0 0 0 0 rgba(94,234,212,0); }
+    }
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 16px;
       margin-top: 24px;
     }
-    .card, .chart-card {
+    .card, .chart-card, .loading-card {
       background: linear-gradient(180deg, var(--panel), var(--panel-2));
       border: 1px solid var(--line);
       border-radius: 18px;
       box-shadow: 0 18px 40px rgba(0,0,0,0.22);
     }
-    .card { padding: 18px; }
+    .card, .loading-card { padding: 18px; }
     .coin {
       display: flex;
       align-items: center;
@@ -91,6 +118,8 @@
     .chart-card {
       margin-top: 22px;
       padding: 18px;
+      position: relative;
+      overflow: hidden;
     }
     .chart-header {
       display: flex;
@@ -120,6 +149,29 @@
       width: 100%;
       height: 280px;
       display: block;
+      transition: opacity 0.2s ease;
+    }
+    .chart-syncing svg {
+      opacity: 0.65;
+    }
+    .loading-card {
+      display: grid;
+      gap: 10px;
+      min-height: 156px;
+    }
+    .skeleton {
+      border-radius: 12px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,255,255,0.11), rgba(255,255,255,0.05));
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    .s1 { height: 18px; width: 42%; }
+    .s2 { height: 36px; width: 60%; }
+    .s3 { height: 14px; width: 55%; }
+    .s4 { height: 14px; width: 72%; }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
     }
     .chart-meta {
       display: flex;
@@ -146,12 +198,15 @@
         <h1>Crypto Pulse</h1>
         <div class="sub">A lightweight market dashboard showing Bitcoin, Ethereum, and Solana, with a simple 7 day chart. This version polls a Vercel serverless API every 15 seconds for live updates.</div>
       </div>
-      <div class="small" id="updated">Loading live market data...</div>
+      <div class="statusline">
+        <span class="dot" id="statusDot"></span>
+        <span id="updated">Loading live market data...</span>
+      </div>
     </div>
 
     <div class="grid" id="cards"></div>
 
-    <section class="chart-card">
+    <section class="chart-card" id="chartCard">
       <div class="chart-header">
         <div>
           <div class="chart-title" id="chartTitle">7 day price chart</div>
@@ -181,7 +236,7 @@
   </div>
 
   <script>
-    const state = { data: [], selected: 'bitcoin' };
+    const state = { data: [], selected: 'bitcoin', loading: true, syncing: false, hadSuccess: false };
     let timer = null;
 
     function usd(value) {
@@ -193,8 +248,33 @@
       return `${sign}${value.toFixed(2)}%`;
     }
 
+    function setStatus(text, mode = 'ok') {
+      const updated = document.getElementById('updated');
+      const dot = document.getElementById('statusDot');
+      updated.textContent = text;
+      dot.className = 'dot';
+      if (mode === 'syncing') dot.classList.add('syncing');
+      if (mode === 'warn') dot.classList.add('warn');
+    }
+
+    function renderLoadingCards() {
+      const root = document.getElementById('cards');
+      root.innerHTML = Array.from({ length: 3 }).map(() => `
+        <article class="loading-card">
+          <div class="skeleton s1"></div>
+          <div class="skeleton s2"></div>
+          <div class="skeleton s3"></div>
+          <div class="skeleton s4"></div>
+        </article>
+      `).join('');
+    }
+
     function renderCards() {
       const root = document.getElementById('cards');
+      if (state.loading && !state.hadSuccess) {
+        renderLoadingCards();
+        return;
+      }
       root.innerHTML = state.data.map(coin => {
         const change = coin.price_change_percentage_24h_in_currency ?? coin.price_change_percentage_24h ?? 0;
         const cls = change >= 0 ? 'up' : 'down';
@@ -245,9 +325,12 @@
     }
 
     function renderChart() {
+      const chartCard = document.getElementById('chartCard');
+      chartCard.classList.toggle('chart-syncing', state.syncing);
       const coin = state.data.find(c => c.id === state.selected);
       if (!coin) return;
       const prices = coin.sparkline_in_7d?.price || [];
+      if (!prices.length) return;
       const { line, area, min, max } = buildPath(prices, 900, 280, 24);
       document.getElementById('linePath').setAttribute('d', line);
       document.getElementById('areaPath').setAttribute('d', area);
@@ -258,18 +341,30 @@
 
     function renderAll() {
       renderCards();
-      renderTabs();
-      renderChart();
+      if (state.data.length) {
+        renderTabs();
+        renderChart();
+      }
       const updated = state.data[0]?.last_updated ? new Date(state.data[0].last_updated) : new Date();
-      document.getElementById('updated').textContent = `Updated ${updated.toLocaleString()} , refreshes every 15s`;
+      setStatus(`Updated ${updated.toLocaleString()} , refreshes every 15s`, state.syncing ? 'syncing' : 'ok');
     }
 
     async function refreshData() {
+      state.syncing = true;
+      if (!state.hadSuccess) state.loading = true;
+      renderCards();
+      renderChart();
+      setStatus(state.hadSuccess ? 'Syncing fresh prices...' : 'Loading live market data...', 'syncing');
+
       const res = await fetch('/api/prices', { cache: 'no-store' });
       if (!res.ok) throw new Error('fetch_failed');
       const data = await res.json();
+      if (!Array.isArray(data) || data.length === 0) throw new Error('empty_data');
       const preserve = state.selected;
       state.data = data;
+      state.loading = false;
+      state.syncing = false;
+      state.hadSuccess = true;
       if (!data.find(c => c.id === preserve)) {
         state.selected = data[0]?.id || 'bitcoin';
       }
@@ -280,16 +375,23 @@
       try {
         await refreshData();
       } catch (error) {
-        document.getElementById('updated').textContent = 'Failed to load live data';
+        state.loading = false;
+        state.syncing = false;
+        renderCards();
+        setStatus('Failed to load live data', 'warn');
         document.getElementById('cards').innerHTML = '<article class="card"><div class="name">Could not fetch prices</div><div class="small">Try refreshing in a moment.</div></article>';
       }
+
       timer = setInterval(() => {
         refreshData().catch(() => {
-          document.getElementById('updated').textContent = 'Temporary refresh issue, retrying...';
+          state.syncing = false;
+          renderChart();
+          setStatus(state.hadSuccess ? 'Temporary refresh issue, retrying...' : 'Failed to load live data', 'warn');
         });
       }, 15000);
     }
 
+    renderLoadingCards();
     start();
   </script>
 </body>
