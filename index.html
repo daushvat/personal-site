@@ -3,418 +3,668 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Crypto Pulse</title>
+  <title>Neon Trail</title>
   <style>
     :root {
-      --bg: #07111f;
-      --panel: #101b2d;
-      --panel-2: #15233a;
-      --text: #eef4ff;
-      --muted: #9db0d0;
-      --accent: #5eead4;
-      --accent-2: #60a5fa;
-      --up: #22c55e;
-      --down: #ef4444;
-      --line: rgba(255,255,255,0.08);
-      --warn: #fbbf24;
+      --bg: #050816;
+      --bg-2: #0b1330;
+      --panel: rgba(10, 16, 38, 0.78);
+      --line: rgba(135, 246, 255, 0.18);
+      --text: #e6f7ff;
+      --muted: #8ea7c7;
+      --cyan: #6cf7ff;
+      --pink: #ff4fd8;
+      --violet: #8b5cf6;
+      --lime: #b8ff6a;
+      --danger: #ff6b81;
+      --glow-cyan: 0 0 12px rgba(108, 247, 255, 0.85), 0 0 28px rgba(108, 247, 255, 0.35);
+      --glow-pink: 0 0 12px rgba(255, 79, 216, 0.75), 0 0 30px rgba(255, 79, 216, 0.35);
     }
+
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
-      font-family: Inter, Arial, sans-serif;
-      background: radial-gradient(circle at top, #0d1d35 0%, var(--bg) 55%);
-      color: var(--text);
       min-height: 100vh;
-    }
-    .wrap {
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 32px 20px 64px;
-    }
-    .hero {
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
-      align-items: end;
-      flex-wrap: wrap;
-      margin-bottom: 24px;
-    }
-    h1 {
-      margin: 0 0 8px;
-      font-size: clamp(2rem, 4vw, 3.2rem);
-    }
-    .sub {
-      color: var(--muted);
-      max-width: 720px;
-      line-height: 1.6;
-    }
-    .badge {
-      display: inline-block;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(96,165,250,0.14);
-      color: #cfe1ff;
-      font-size: 0.9rem;
-      margin-bottom: 10px;
-    }
-    .statusline {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: var(--muted);
-      font-size: 0.92rem;
-    }
-    .spinner {
-      width: 18px;
-      height: 18px;
-      display: inline-block;
-      flex: 0 0 auto;
-    }
-    .spinner svg {
-      width: 18px;
-      height: 18px;
-      display: block;
-    }
-    .spinner-ring {
-      stroke: rgba(255,255,255,0.14);
-    }
-    .spinner-arc {
-      stroke: var(--accent);
-      stroke-linecap: round;
-      transform-origin: 50% 50%;
-    }
-    .spinner.syncing .spinner-arc {
-      animation: spin 1s linear infinite;
-    }
-    .spinner.warn .spinner-arc {
-      stroke: var(--warn);
-      animation: spin 1.2s linear infinite;
-    }
-    .spinner.idle .spinner-arc {
-      animation: none;
-      stroke: var(--accent);
-      opacity: 0.9;
-    }
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-top: 24px;
-    }
-    .card, .chart-card, .loading-card {
-      background: linear-gradient(180deg, var(--panel), var(--panel-2));
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      box-shadow: 0 18px 40px rgba(0,0,0,0.22);
-    }
-    .card, .loading-card { padding: 18px; }
-    .coin {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    .coin img {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.08);
-    }
-    .name { font-weight: 700; }
-    .symbol { color: var(--muted); font-size: 0.9rem; text-transform: uppercase; }
-    .price { font-size: 1.7rem; font-weight: 800; margin-bottom: 6px; }
-    .change { font-weight: 700; }
-    .up { color: var(--up); }
-    .down { color: var(--down); }
-    .small { color: var(--muted); font-size: 0.92rem; }
-    .chart-card {
-      margin-top: 22px;
-      padding: 18px;
-      position: relative;
+      font-family: Inter, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, rgba(75, 0, 130, 0.25), transparent 35%),
+        radial-gradient(circle at 20% 20%, rgba(0, 255, 255, 0.14), transparent 28%),
+        linear-gradient(180deg, var(--bg-2), var(--bg));
       overflow: hidden;
     }
-    .chart-header {
+
+    .scanlines::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.03) 0px,
+        rgba(255,255,255,0.03) 1px,
+        transparent 2px,
+        transparent 4px
+      );
+      opacity: 0.22;
+      mix-blend-mode: soft-light;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .shell {
+      width: min(100%, 980px);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 280px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .stage, .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.02), 0 25px 80px rgba(0,0,0,0.45);
+    }
+
+    .stage {
+      padding: 18px;
+    }
+
+    .panel {
+      padding: 18px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .hud {
       display: flex;
       justify-content: space-between;
-      gap: 12px;
+      gap: 14px;
       flex-wrap: wrap;
-      align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
-    .chart-title { font-size: 1.1rem; font-weight: 700; }
-    .tabs { display: flex; gap: 8px; flex-wrap: wrap; }
-    .tab {
-      background: rgba(255,255,255,0.05);
-      color: var(--text);
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 8px 12px;
-      cursor: pointer;
-      font-weight: 600;
+
+    .title {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      text-shadow: var(--glow-cyan);
+      margin: 0 0 6px;
     }
-    .tab.active {
-      background: rgba(94,234,212,0.14);
-      border-color: rgba(94,234,212,0.4);
-      color: #d5fff8;
+
+    .sub {
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.5;
+      font-size: 0.96rem;
     }
-    svg {
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      width: min(100%, 280px);
+    }
+
+    .stat {
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: white;
+    }
+
+    canvas {
       width: 100%;
-      height: 280px;
       display: block;
-      transition: opacity 0.2s ease;
+      background:
+        linear-gradient(180deg, rgba(5, 12, 30, 0.9), rgba(3, 8, 22, 0.95)),
+        radial-gradient(circle at center, rgba(108,247,255,0.05), transparent 55%);
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.07);
+      box-shadow: inset 0 0 35px rgba(0,0,0,0.45), 0 0 30px rgba(108,247,255,0.08);
     }
-    .chart-syncing svg {
-      opacity: 0.65;
+
+    .status {
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text);
+      line-height: 1.5;
     }
-    .loading-card {
+
+    .status strong {
+      color: var(--pink);
+      text-shadow: var(--glow-pink);
+    }
+
+    .btn {
+      appearance: none;
+      border: 0;
+      border-radius: 14px;
+      padding: 13px 16px;
+      font-size: 0.98rem;
+      font-weight: 800;
+      cursor: pointer;
+      color: #061018;
+      background: linear-gradient(135deg, var(--cyan), #9cf7ff);
+      box-shadow: var(--glow-cyan);
+      transition: transform 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    .controls, .tips {
       display: grid;
       gap: 10px;
-      min-height: 156px;
     }
-    .skeleton {
+
+    .controls h2, .tips h2 {
+      margin: 0;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--cyan);
+    }
+
+    .key-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .key {
+      padding: 10px 12px;
       border-radius: 12px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,255,255,0.11), rgba(255,255,255,0.05));
-      background-size: 200% 100%;
-      animation: shimmer 1.4s infinite;
-    }
-    .s1 { height: 18px; width: 42%; }
-    .s2 { height: 36px; width: 60%; }
-    .s3 { height: 14px; width: 55%; }
-    .s4 { height: 14px; width: 72%; }
-    @keyframes shimmer {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-    .chart-meta {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
       color: var(--muted);
       font-size: 0.92rem;
-      margin-top: 10px;
-      flex-wrap: wrap;
     }
-    footer {
-      margin-top: 26px;
+
+    .key b {
+      color: white;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 8px;
       color: var(--muted);
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      line-height: 1.5;
     }
-    a { color: #cfe1ff; }
+
+    li::before {
+      content: "✦";
+      color: var(--cyan);
+      margin-right: 8px;
+    }
+
+    .mobile-pad {
+      display: none;
+      grid-template-columns: repeat(3, 64px);
+      grid-template-areas:
+        ". up ."
+        "left down right";
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .pad-btn {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.05);
+      color: white;
+      border-radius: 16px;
+      width: 64px;
+      height: 64px;
+      font-size: 1.4rem;
+      box-shadow: 0 0 18px rgba(108,247,255,0.12);
+    }
+
+    .up { grid-area: up; }
+    .left { grid-area: left; }
+    .right { grid-area: right; }
+    .down { grid-area: down; }
+
+    @media (max-width: 900px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+      .panel {
+        order: -1;
+      }
+    }
+
+    @media (max-width: 680px) {
+      body {
+        overflow: auto;
+      }
+      .wrap {
+        padding: 14px;
+      }
+      .stage, .panel {
+        border-radius: 20px;
+      }
+      .mobile-pad {
+        display: grid;
+      }
+    }
   </style>
 </head>
-<body>
+<body class="scanlines">
   <div class="wrap">
-    <div class="hero">
-      <div>
-        <div class="badge">Live Crypto Polling</div>
-        <h1>Crypto Pulse</h1>
-        <div class="sub">A lightweight market dashboard showing Bitcoin, Ethereum, and Solana, with a simple 7 day chart. This version polls a Vercel serverless API every 15 seconds for live updates.</div>
-      </div>
-      <div class="statusline">
-        <span class="spinner syncing" id="statusSpinner" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none">
-            <circle class="spinner-ring" cx="12" cy="12" r="9" stroke-width="2.5"></circle>
-            <path class="spinner-arc" d="M21 12a9 9 0 0 0-9-9" stroke-width="2.5"></path>
-          </svg>
-        </span>
-        <span id="updated">Loading live market data...</span>
-      </div>
-    </div>
-
-    <div class="grid" id="cards"></div>
-
-    <section class="chart-card" id="chartCard">
-      <div class="chart-header">
-        <div>
-          <div class="chart-title" id="chartTitle">7 day price chart</div>
-          <div class="small">Polled from your own Vercel API route</div>
+    <div class="shell">
+      <section class="stage">
+        <div class="hud">
+          <div>
+            <h1 class="title">Neon Trail</h1>
+            <div class="sub">Snake-like, but sharper. Glide through a glowing grid, collect energy cores, and survive as the speed climbs.</div>
+          </div>
+          <div class="stat-grid">
+            <div class="stat">
+              <div class="stat-label">Score</div>
+              <div class="stat-value" id="score">0</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Best</div>
+              <div class="stat-value" id="best">0</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Level</div>
+              <div class="stat-value" id="level">1</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Speed</div>
+              <div class="stat-value" id="speed">1.0x</div>
+            </div>
+          </div>
         </div>
-        <div class="tabs" id="tabs"></div>
-      </div>
-      <svg viewBox="0 0 900 280" preserveAspectRatio="none" aria-label="price chart">
-        <defs>
-          <linearGradient id="fillGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#60a5fa" stop-opacity="0.38" />
-            <stop offset="100%" stop-color="#60a5fa" stop-opacity="0.02" />
-          </linearGradient>
-        </defs>
-        <path id="areaPath" fill="url(#fillGradient)"></path>
-        <path id="linePath" fill="none" stroke="#60a5fa" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
-      </svg>
-      <div class="chart-meta">
-        <span id="rangeLow"></span>
-        <span id="rangeHigh"></span>
-      </div>
-    </section>
 
-    <footer>
-      Hosted on Vercel. Updates every 15 seconds.
-    </footer>
+        <canvas id="game" width="720" height="720" aria-label="Neon Trail game"></canvas>
+      </section>
+
+      <aside class="panel">
+        <div class="status" id="status"><strong>Ready.</strong> Press Space or the button below to start.</div>
+        <button class="btn" id="startBtn">Start / Restart</button>
+
+        <section class="controls">
+          <h2>Controls</h2>
+          <div class="key-grid">
+            <div class="key"><b>↑ ↓ ← →</b><br />Move</div>
+            <div class="key"><b>W A S D</b><br />Move</div>
+            <div class="key"><b>Space</b><br />Start</div>
+            <div class="key"><b>P</b><br />Pause</div>
+          </div>
+        </section>
+
+        <section class="tips">
+          <h2>How it plays</h2>
+          <ul>
+            <li>Each energy core extends your trail and increases your score.</li>
+            <li>The arena wraps around the edges, so use the borders strategically.</li>
+            <li>Avoid crashing into your own neon trail.</li>
+            <li>Every few pickups, the game gets faster.</li>
+          </ul>
+        </section>
+
+        <div class="mobile-pad" aria-label="mobile controls">
+          <button class="pad-btn up" data-dir="up">↑</button>
+          <button class="pad-btn left" data-dir="left">←</button>
+          <button class="pad-btn down" data-dir="down">↓</button>
+          <button class="pad-btn right" data-dir="right">→</button>
+        </div>
+      </aside>
+    </div>
   </div>
 
   <script>
-    const state = { data: [], selected: 'bitcoin', loading: true, syncing: false, hadSuccess: false };
-    let timer = null;
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
 
-    function usd(value) {
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: value >= 100 ? 0 : 2 }).format(value);
+    const scoreEl = document.getElementById('score');
+    const bestEl = document.getElementById('best');
+    const levelEl = document.getElementById('level');
+    const speedEl = document.getElementById('speed');
+    const statusEl = document.getElementById('status');
+    const startBtn = document.getElementById('startBtn');
+
+    const gridSize = 24;
+    const tileCount = canvas.width / gridSize;
+    const baseTick = 120;
+
+    const storedBest = Number(localStorage.getItem('neon-trail-best') || 0);
+
+    const state = {
+      snake: [],
+      dir: { x: 1, y: 0 },
+      nextDir: { x: 1, y: 0 },
+      food: { x: 10, y: 10 },
+      score: 0,
+      best: storedBest,
+      level: 1,
+      tick: baseTick,
+      running: false,
+      paused: false,
+      gameOver: false,
+      accumulator: 0,
+      lastTime: 0,
+      pulse: 0
+    };
+
+    bestEl.textContent = state.best;
+
+    function setStatus(message, accent = 'pink') {
+      const glow = accent === 'cyan' ? 'var(--glow-cyan)' : 'var(--glow-pink)';
+      const color = accent === 'cyan' ? 'var(--cyan)' : 'var(--pink)';
+      statusEl.innerHTML = `<strong style="color:${color}; text-shadow:${glow}">${message}</strong>`;
     }
 
-    function pct(value) {
-      const sign = value >= 0 ? '+' : '';
-      return `${sign}${value.toFixed(2)}%`;
+    function randomCell() {
+      return Math.floor(Math.random() * tileCount);
     }
 
-    function setStatus(text, mode = 'ok') {
-      const updated = document.getElementById('updated');
-      const spinner = document.getElementById('statusSpinner');
-      updated.textContent = text;
-      spinner.className = 'spinner';
-      if (mode === 'syncing') spinner.classList.add('syncing');
-      else if (mode === 'warn') spinner.classList.add('warn');
-      else spinner.classList.add('idle');
+    function placeFood() {
+      do {
+        state.food = { x: randomCell(), y: randomCell() };
+      } while (state.snake.some(part => part.x === state.food.x && part.y === state.food.y));
     }
 
-    function renderLoadingCards() {
-      const root = document.getElementById('cards');
-      root.innerHTML = Array.from({ length: 3 }).map(() => `
-        <article class="loading-card">
-          <div class="skeleton s1"></div>
-          <div class="skeleton s2"></div>
-          <div class="skeleton s3"></div>
-          <div class="skeleton s4"></div>
-        </article>
-      `).join('');
+    function resetGame() {
+      state.snake = [
+        { x: 8, y: 12 },
+        { x: 7, y: 12 },
+        { x: 6, y: 12 },
+        { x: 5, y: 12 }
+      ];
+      state.dir = { x: 1, y: 0 };
+      state.nextDir = { x: 1, y: 0 };
+      state.score = 0;
+      state.level = 1;
+      state.tick = baseTick;
+      state.running = true;
+      state.paused = false;
+      state.gameOver = false;
+      state.accumulator = 0;
+      state.lastTime = 0;
+      placeFood();
+      updateHud();
+      setStatus('Run live. Hunt the core.', 'cyan');
     }
 
-    function renderCards() {
-      const root = document.getElementById('cards');
-      if (state.loading && !state.hadSuccess) {
-        renderLoadingCards();
+    function updateHud() {
+      scoreEl.textContent = state.score;
+      bestEl.textContent = state.best;
+      levelEl.textContent = state.level;
+      speedEl.textContent = `${(baseTick / state.tick).toFixed(1)}x`;
+    }
+
+    function queueDirection(direction) {
+      const map = {
+        up: { x: 0, y: -1 },
+        down: { x: 0, y: 1 },
+        left: { x: -1, y: 0 },
+        right: { x: 1, y: 0 }
+      };
+      const next = map[direction];
+      if (!next) return;
+      if (next.x === -state.dir.x && next.y === -state.dir.y) return;
+      state.nextDir = next;
+    }
+
+    function step() {
+      if (!state.running || state.paused || state.gameOver) return;
+
+      state.dir = state.nextDir;
+      const head = state.snake[0];
+      const nextHead = {
+        x: (head.x + state.dir.x + tileCount) % tileCount,
+        y: (head.y + state.dir.y + tileCount) % tileCount
+      };
+
+      if (state.snake.some(part => part.x === nextHead.x && part.y === nextHead.y)) {
+        state.gameOver = true;
+        state.running = false;
+        if (state.score > state.best) {
+          state.best = state.score;
+          localStorage.setItem('neon-trail-best', String(state.best));
+        }
+        updateHud();
+        setStatus(`Crash detected. Final score: ${state.score}.`, 'pink');
         return;
       }
-      root.innerHTML = state.data.map(coin => {
-        const change = coin.price_change_percentage_24h_in_currency ?? coin.price_change_percentage_24h ?? 0;
-        const cls = change >= 0 ? 'up' : 'down';
-        return `
-          <article class="card">
-            <div class="coin">
-              <img src="${coin.image}" alt="${coin.name}" />
-              <div>
-                <div class="name">${coin.name}</div>
-                <div class="symbol">${coin.symbol}</div>
-              </div>
-            </div>
-            <div class="price">${usd(coin.current_price)}</div>
-            <div class="change ${cls}">${pct(change)} today</div>
-            <div class="small">24h range: ${usd(coin.low_24h)} to ${usd(coin.high_24h)}</div>
-          </article>
-        `;
-      }).join('');
+
+      state.snake.unshift(nextHead);
+
+      if (nextHead.x === state.food.x && nextHead.y === state.food.y) {
+        state.score += 10;
+        if (state.score > state.best) {
+          state.best = state.score;
+          localStorage.setItem('neon-trail-best', String(state.best));
+        }
+        const newLevel = 1 + Math.floor(state.score / 50);
+        if (newLevel !== state.level) {
+          state.level = newLevel;
+          state.tick = Math.max(58, baseTick - (state.level - 1) * 8);
+          setStatus(`Level ${state.level}. Speed increased.`, 'cyan');
+        } else {
+          setStatus('Core captured. Keep moving.', 'cyan');
+        }
+        placeFood();
+      } else {
+        state.snake.pop();
+      }
+
+      updateHud();
     }
 
-    function renderTabs() {
-      const tabs = document.getElementById('tabs');
-      tabs.innerHTML = state.data.map(coin => `
-        <button class="tab ${coin.id === state.selected ? 'active' : ''}" data-id="${coin.id}">${coin.name}</button>
-      `).join('');
-      tabs.querySelectorAll('.tab').forEach(btn => {
-        btn.addEventListener('click', () => {
-          state.selected = btn.dataset.id;
-          renderTabs();
-          renderChart();
-        });
+    function drawGrid() {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(108, 247, 255, 0.08)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= tileCount; i++) {
+        const pos = i * gridSize;
+        ctx.beginPath();
+        ctx.moveTo(pos, 0);
+        ctx.lineTo(pos, canvas.height);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, pos);
+        ctx.lineTo(canvas.width, pos);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawFood() {
+      const x = state.food.x * gridSize + gridSize / 2;
+      const y = state.food.y * gridSize + gridSize / 2;
+      const pulse = 0.75 + Math.sin(state.pulse / 220) * 0.15;
+      const radius = gridSize * 0.28 * pulse;
+
+      ctx.save();
+      const glow = ctx.createRadialGradient(x, y, 2, x, y, gridSize * 0.62);
+      glow.addColorStop(0, 'rgba(184,255,106,1)');
+      glow.addColorStop(0.45, 'rgba(108,247,255,0.85)');
+      glow.addColorStop(1, 'rgba(108,247,255,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(x, y, gridSize * 0.62, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#b8ff6a';
+      ctx.shadowBlur = 22;
+      ctx.shadowColor = '#b8ff6a';
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawSnake() {
+      state.snake.forEach((part, index) => {
+        const x = part.x * gridSize;
+        const y = part.y * gridSize;
+        const isHead = index === 0;
+        const alpha = 1 - index / Math.max(state.snake.length + 2, 8);
+
+        ctx.save();
+        ctx.fillStyle = isHead ? 'rgba(255,79,216,0.95)' : `rgba(108,247,255,${Math.max(alpha, 0.2)})`;
+        ctx.shadowBlur = isHead ? 26 : 18;
+        ctx.shadowColor = isHead ? '#ff4fd8' : '#6cf7ff';
+        roundRect(ctx, x + 2, y + 2, gridSize - 4, gridSize - 4, 8);
+        ctx.fill();
+
+        if (isHead) {
+          ctx.fillStyle = '#fff';
+          const eyeOffsetX = state.dir.x !== 0 ? (state.dir.x > 0 ? 15 : 7) : 8;
+          const eyeOffsetYTop = state.dir.y > 0 ? 14 : 8;
+          const eyeOffsetYBottom = state.dir.y < 0 ? 8 : 14;
+          ctx.beginPath();
+          ctx.arc(x + eyeOffsetX, y + eyeOffsetYTop, 2, 0, Math.PI * 2);
+          ctx.arc(x + eyeOffsetX, y + eyeOffsetYBottom, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
       });
     }
 
-    function buildPath(points, width, height, padding) {
-      const min = Math.min(...points);
-      const max = Math.max(...points);
-      const span = max - min || 1;
-      const step = (width - padding * 2) / Math.max(points.length - 1, 1);
-      const coords = points.map((p, i) => {
-        const x = padding + i * step;
-        const y = height - padding - ((p - min) / span) * (height - padding * 2);
-        return [x, y];
-      });
-      const line = coords.map(([x, y], i) => `${i === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`).join(' ');
-      const area = `${line} L ${coords[coords.length - 1][0].toFixed(2)} ${(height - padding).toFixed(2)} L ${coords[0][0].toFixed(2)} ${(height - padding).toFixed(2)} Z`;
-      return { line, area, min, max };
+    function roundRect(context, x, y, width, height, radius) {
+      context.beginPath();
+      context.moveTo(x + radius, y);
+      context.lineTo(x + width - radius, y);
+      context.quadraticCurveTo(x + width, y, x + width, y + radius);
+      context.lineTo(x + width, y + height - radius);
+      context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      context.lineTo(x + radius, y + height);
+      context.quadraticCurveTo(x, y + height, x, y + height - radius);
+      context.lineTo(x, y + radius);
+      context.quadraticCurveTo(x, y, x + radius, y);
+      context.closePath();
     }
 
-    function renderChart() {
-      const chartCard = document.getElementById('chartCard');
-      chartCard.classList.toggle('chart-syncing', state.syncing);
-      const coin = state.data.find(c => c.id === state.selected);
-      if (!coin) return;
-      const prices = coin.sparkline_in_7d?.price || [];
-      if (!prices.length) return;
-      const { line, area, min, max } = buildPath(prices, 900, 280, 24);
-      document.getElementById('linePath').setAttribute('d', line);
-      document.getElementById('areaPath').setAttribute('d', area);
-      document.getElementById('chartTitle').textContent = `${coin.name} 7 day price chart`;
-      document.getElementById('rangeLow').textContent = `Low: ${usd(min)}`;
-      document.getElementById('rangeHigh').textContent = `High: ${usd(max)}`;
+    function drawOverlay() {
+      if (state.running && !state.paused && !state.gameOver) return;
+
+      ctx.save();
+      ctx.fillStyle = 'rgba(3, 8, 20, 0.58)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.textAlign = 'center';
+
+      ctx.fillStyle = '#6cf7ff';
+      ctx.shadowBlur = 24;
+      ctx.shadowColor = '#6cf7ff';
+      ctx.font = '900 48px Inter, Arial';
+      const title = state.gameOver ? 'SYSTEM BREAK' : state.paused ? 'PAUSED' : 'NEON TRAIL';
+      ctx.fillText(title, canvas.width / 2, canvas.height / 2 - 20);
+
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = '#d7e9ff';
+      ctx.font = '500 20px Inter, Arial';
+      const subtitle = state.gameOver
+        ? 'Press Space or Start to jump back in'
+        : state.paused
+          ? 'Press P to resume'
+          : 'Press Space or Start to begin';
+      ctx.fillText(subtitle, canvas.width / 2, canvas.height / 2 + 24);
+      ctx.restore();
     }
 
-    function renderAll() {
-      renderCards();
-      if (state.data.length) {
-        renderTabs();
-        renderChart();
-      }
-      const updated = state.data[0]?.last_updated ? new Date(state.data[0].last_updated) : new Date();
-      setStatus(`Updated ${updated.toLocaleString()} , refreshes every 15s`, state.syncing ? 'syncing' : 'ok');
+    function render() {
+      state.pulse += 16;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawGrid();
+      drawFood();
+      drawSnake();
+      drawOverlay();
     }
 
-    async function refreshData() {
-      state.syncing = true;
-      if (!state.hadSuccess) state.loading = true;
-      renderCards();
-      renderChart();
-      setStatus(state.hadSuccess ? 'Syncing fresh prices...' : 'Loading live market data...', 'syncing');
+    function loop(timestamp) {
+      if (!state.lastTime) state.lastTime = timestamp;
+      const delta = timestamp - state.lastTime;
+      state.lastTime = timestamp;
+      state.accumulator += delta;
 
-      const res = await fetch('/api/prices', { cache: 'no-store' });
-      if (!res.ok) throw new Error('fetch_failed');
-      const data = await res.json();
-      if (!Array.isArray(data) || data.length === 0) throw new Error('empty_data');
-      const preserve = state.selected;
-      state.data = data;
-      state.loading = false;
-      state.syncing = false;
-      state.hadSuccess = true;
-      if (!data.find(c => c.id === preserve)) {
-        state.selected = data[0]?.id || 'bitcoin';
-      }
-      renderAll();
-    }
-
-    async function start() {
-      try {
-        await refreshData();
-      } catch (error) {
-        state.loading = false;
-        state.syncing = false;
-        renderCards();
-        setStatus('Failed to load live data', 'warn');
-        document.getElementById('cards').innerHTML = '<article class="card"><div class="name">Could not fetch prices</div><div class="small">Try refreshing in a moment.</div></article>';
+      while (state.accumulator >= state.tick) {
+        step();
+        state.accumulator -= state.tick;
       }
 
-      timer = setInterval(() => {
-        refreshData().catch(() => {
-          state.syncing = false;
-          renderChart();
-          setStatus(state.hadSuccess ? 'Temporary refresh issue, retrying...' : 'Failed to load live data', 'warn');
-        });
-      }, 15000);
+      render();
+      requestAnimationFrame(loop);
     }
 
-    renderLoadingCards();
-    start();
+    function startGame() {
+      resetGame();
+    }
+
+    function togglePause() {
+      if (state.gameOver || !state.running) return;
+      state.paused = !state.paused;
+      setStatus(state.paused ? 'Paused.' : 'Back online.', state.paused ? 'pink' : 'cyan');
+    }
+
+    document.addEventListener('keydown', event => {
+      const key = event.key.toLowerCase();
+      if (["arrowup", "arrowdown", "arrowleft", "arrowright", " ", "w", "a", "s", "d", "p"].includes(key)) {
+        event.preventDefault();
+      }
+
+      if (key === 'arrowup' || key === 'w') queueDirection('up');
+      else if (key === 'arrowdown' || key === 's') queueDirection('down');
+      else if (key === 'arrowleft' || key === 'a') queueDirection('left');
+      else if (key === 'arrowright' || key === 'd') queueDirection('right');
+      else if (key === ' ') {
+        if (!state.running || state.gameOver) startGame();
+      } else if (key === 'p') {
+        togglePause();
+      }
+    }, { passive: false });
+
+    startBtn.addEventListener('click', startGame);
+
+    document.querySelectorAll('.pad-btn').forEach(btn => {
+      btn.addEventListener('click', () => queueDirection(btn.dataset.dir));
+    });
+
+    updateHud();
+    render();
+    requestAnimationFrame(loop);
   </script>
 </body>
 </html>
